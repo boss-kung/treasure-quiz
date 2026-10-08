@@ -2,7 +2,7 @@ export type QuestionType = 'true_false' | 'multiple_choice' | 'time_bank' | 'no_
 export type TimingMode = 'per_question' | 'total';
 export type BetType = 'safe' | 'gold' | 'diamond';
 export type HostActionName =
-  | 'get_setup' | 'save_question' | 'save_chest_type' | 'delete_chest_type' | 'save_reward_item' | 'delete_reward_item' | 'create_game'
+  | 'get_setup' | 'get_lobby_status' | 'save_question' | 'save_chest_type' | 'delete_chest_type' | 'save_reward_item' | 'delete_reward_item' | 'create_game'
   | 'start_game' | 'open_briefing' | 'start_round' | 'reveal_round'
   | 'advance_phase' | 'pause_game' | 'resume_game'
   | 'get_redemptions'

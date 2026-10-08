@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGameRealtime } from '../../hooks/useGameRealtime';
 import { useGameStore } from '../../store/gameStore';
 import type { GameSnapshot, HostActionCaller } from '../../domain/types';
@@ -8,7 +8,28 @@ interface HostLobbyScreenProps { game: GameSnapshot; action: HostActionCaller; o
 export default function HostLobbyScreen({ game, action, onStarted }: HostLobbyScreenProps) {
   useGameRealtime(game.id);
   const playerConnected = useGameStore((state) => state.playerConnected);
+  const setPlayerConnected = useGameStore((state) => state.setPlayerConnected);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const refresh = async () => {
+      try {
+        const response = await action<{ playerConnected?: boolean }>('get_lobby_status', { gameId: game.id });
+        if (active) setPlayerConnected(Boolean(response.playerConnected));
+      } catch {
+        // Keep the last known status and retry; Realtime remains a best-effort fast path.
+      }
+    };
+
+    void refresh();
+    const timer = window.setInterval(() => { void refresh(); }, 1_800);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [action, game.id, setPlayerConnected]);
+
   const start = async () => {
     if (busy) return;
     setBusy(true);
