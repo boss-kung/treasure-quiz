@@ -65,9 +65,10 @@ function HostShell() {
     if (!authenticated) return;
     let active = true;
     setSetupLoading(true);
-    void hostAction<{ questions?: QuestionDraft[]; chests?: ChestDraft[]; rewards?: RewardDraft[]; roundSettings?: RoundSettings[] }>('get_setup')
+    void hostAction<{ activeGame?: GameSnapshot | null; questions?: QuestionDraft[]; chests?: ChestDraft[]; rewards?: RewardDraft[]; roundSettings?: RoundSettings[] }>('get_setup')
       .then((response) => {
         if (!active) return;
+        setGame(response.activeGame ?? null);
         setSetup({
           questions: response.questions?.length ? response.questions : starterQuestions,
           chests: response.chests?.length ? response.chests : starterChests,
