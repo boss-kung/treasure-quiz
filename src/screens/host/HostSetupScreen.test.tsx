@@ -32,9 +32,9 @@ describe('HostSetupScreen', () => {
 
   it('shows the required question count for every round', () => {
     render(<HostSetupScreen initialQuestions={questions()} initialChests={chests} action={vi.fn()} />);
-    expect(screen.getByText('รอบ 1 · 10 ข้อ')).toBeInTheDocument();
-    expect(screen.getByText('รอบ 3 · 5 ข้อ')).toBeInTheDocument();
-    expect(screen.getByText('รอบ 8 · 5 ข้อ')).toBeInTheDocument();
+    expect(screen.getByText('รอบ 1 · 10/10 ข้อ')).toBeInTheDocument();
+    expect(screen.getByText('รอบ 3 · 5/5 ข้อ')).toBeInTheDocument();
+    expect(screen.getByText('รอบ 8 · 5/5 ข้อ')).toBeInTheDocument();
   });
 
   it('blocks Save when a question has duplicate choices or no keyword', () => {
@@ -49,13 +49,13 @@ describe('HostSetupScreen', () => {
   it('disables Create Game when there are only 49 questions', () => {
     render(<HostSetupScreen initialQuestions={questions(49)} initialChests={chests} action={vi.fn()} />);
     expect(screen.getByRole('button', { name: /สร้างเกม/i })).toBeDisabled();
-    expect(screen.getByText('49/50')).toBeInTheDocument();
+    expect(screen.getByText('49 ข้อ')).toBeInTheDocument();
   });
 
   it('shows an inline error when chest weights total 99', () => {
     const invalidChests = [{ ...chests[0], rewardTable: [{ amountSatang: 1, weight: 99 }] }];
     render(<HostSetupScreen initialQuestions={questions()} initialChests={invalidChests} action={vi.fn()} />);
-    expect(screen.getByText(/น้ำหนักรางวัลต้องรวม 100%/)).toBeInTheDocument();
+    expect(screen.getByText(/ต้องเท่ากับ 100%/)).toBeInTheDocument();
   });
 
   it('calls create_game once on a double tap when setup is valid', () => {
@@ -66,5 +66,16 @@ describe('HostSetupScreen', () => {
     fireEvent.click(button);
     expect(action).toHaveBeenCalledTimes(1);
     expect(action).toHaveBeenCalledWith('create_game', expect.any(Object));
+  });
+
+  it('sends edited question timing and chest costs in the create payload', () => {
+    const action = vi.fn().mockResolvedValue({ ok: true, game: { id: 'game-1' } });
+    render(<HostSetupScreen initialQuestions={questions()} initialChests={chests} action={action} />);
+    fireEvent.change(screen.getAllByLabelText('เวลา (วินาที)')[0], { target: { value: '25' } });
+    fireEvent.change(screen.getByLabelText('ใช้ทอง'), { target: { value: '250' } });
+    fireEvent.click(screen.getByRole('button', { name: /สร้างเกม/i }));
+    const payload = action.mock.calls[0][1] as { configSnapshot: { roundSettings: Array<{ timeLimitSec: number }> }; chests: ChestDraft[] };
+    expect(payload.configSnapshot.roundSettings[0].timeLimitSec).toBe(25);
+    expect(payload.chests[0].goldCost).toBe(250);
   });
 });

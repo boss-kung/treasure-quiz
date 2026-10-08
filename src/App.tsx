@@ -4,7 +4,8 @@ import { getStoredHostPin, hostAction, playerAction } from './lib/api';
 import HostLoginScreen from './screens/host/HostLoginScreen';
 import HostSetupScreen from './screens/host/HostSetupScreen';
 import HostLobbyScreen from './screens/host/HostLobbyScreen';
-import type { ChestDraft, GameSnapshot, QuestionDraft } from './domain/types';
+import type { ChestDraft, GameSnapshot, QuestionDraft, RewardDraft, RoundSettings } from './domain/types';
+import { defaultRoundSettings } from './lib/setup';
 import PlayerLoginScreen from './screens/player/PlayerLoginScreen';
 import PlayerBriefingScreen from './screens/player/PlayerBriefingScreen';
 import PlayerQuestionScreen from './screens/player/PlayerQuestionScreen';
@@ -43,11 +44,46 @@ const starterQuestions: QuestionDraft[] = Array.from({ length: 50 }, (_, index) 
   };
 });
 
+const starterRewards: RewardDraft[] = [
+  { title: 'เงินสด 100 บาท', rewardKind: 'cash', costSatang: 10000 },
+  { title: 'บุฟเฟต์สุกี้', rewardKind: 'experience', costSatang: 25000 },
+];
+
+interface HostSetupData {
+  questions: QuestionDraft[];
+  chests: ChestDraft[];
+  rewards: RewardDraft[];
+  roundSettings: RoundSettings[];
+}
+
 function HostShell() {
   const [authenticated, setAuthenticated] = useState(() => Boolean(getStoredHostPin()));
   const [game, setGame] = useState<GameSnapshot | null>(null);
+  const [setupLoading, setSetupLoading] = useState(false);
+  const [setup, setSetup] = useState<HostSetupData>({ questions: starterQuestions, chests: starterChests, rewards: starterRewards, roundSettings: defaultRoundSettings() });
+  useEffect(() => {
+    if (!authenticated) return;
+    let active = true;
+    setSetupLoading(true);
+    void hostAction<{ questions?: QuestionDraft[]; chests?: ChestDraft[]; rewards?: RewardDraft[]; roundSettings?: RoundSettings[] }>('get_setup')
+      .then((response) => {
+        if (!active) return;
+        setSetup({
+          questions: response.questions?.length ? response.questions : starterQuestions,
+          chests: response.chests?.length ? response.chests : starterChests,
+          rewards: response.rewards?.length ? response.rewards : starterRewards,
+          roundSettings: response.roundSettings?.length ? response.roundSettings : defaultRoundSettings(),
+        });
+      })
+      .catch(() => undefined)
+      .finally(() => { if (active) setSetupLoading(false); });
+    return () => { active = false; };
+  }, [authenticated]);
   if (!authenticated) return <HostLoginScreen onSuccess={() => setAuthenticated(true)} />;
-  if (!game) return <HostSetupScreen initialQuestions={starterQuestions} initialChests={starterChests} action={hostAction} onCreated={(created) => setGame({ phase: 'waiting', ...created })} />;
+  if (!game) {
+    if (setupLoading) return <main className="host-screen auth-screen"><p className="eyebrow">HOST · SETUP</p><h1>กำลังโหลดชุดตั้งค่า…</h1></main>;
+    return <HostSetupScreen initialQuestions={setup.questions} initialChests={setup.chests} initialRewards={setup.rewards} initialRoundSettings={setup.roundSettings} action={hostAction} onCreated={(created) => setGame({ phase: 'waiting', ...created })} />;
+  }
   if (game.phase === 'waiting') {
     return <HostLobbyScreen game={game} action={hostAction} onStarted={setGame} />;
   }
@@ -66,6 +102,7 @@ interface PlayerRestore {
   opens?: Array<{ id: string; chest_key?: string; result_satang?: number | null; status?: string }>;
   wallet?: { balanceSatang: number; entries: Array<Record<string, unknown>> } | null;
   rewards?: Array<{ id: string; title: string; cost_satang: number }>;
+  chests?: ChestDraft[];
 }
 
 function PlayerShell() {
@@ -94,7 +131,7 @@ function PlayerShell() {
   }
   if (game.phase === 'round_result') return <PlayerRoundResultScreen roundNo={roundNo} gold={game.gold ?? 0} gems={game.gems ?? 0} onContinue={refresh} />;
   if (game.phase === 'event') return <PlayerEventScreen {...common} onComplete={refresh} />;
-  if (game.phase === 'prize_shop') return <PlayerPrizeShopScreen gameId={game.id} gold={game.gold ?? 0} gems={game.gems ?? 0} chests={starterChests} action={playerAction} onConfirmed={() => void refresh()} />;
+  if (game.phase === 'prize_shop') return <PlayerPrizeShopScreen gameId={game.id} gold={game.gold ?? 0} gems={game.gems ?? 0} chests={restore.chests ?? starterChests} action={playerAction} onConfirmed={() => void refresh()} />;
   if (game.phase === 'chest_opening') return <PlayerChestOpeningScreen gameId={game.id} opens={restore.opens ?? []} action={playerAction} />;
   return <PlayerEndScreen restore={restore} />;
 }
