@@ -1,5 +1,6 @@
 import type { QuestionDraft, RoundSettings } from '../../domain/types';
 import { defaultRoundSettings, QUESTION_TYPE_LABELS, validateRoundSettings } from '../../lib/setup';
+import QuestionImportPanel from './QuestionImportPanel';
 import QuestionSettingsEditor from './QuestionSettingsEditor';
 
 interface QuestionEditorProps {
@@ -7,9 +8,10 @@ interface QuestionEditorProps {
   onChange: (questions: QuestionDraft[]) => void;
   settings?: RoundSettings[];
   onSettingsChange?: (settings: RoundSettings[]) => void;
+  onImport?: (questions: QuestionDraft[], settings: RoundSettings[]) => void;
 }
 
-export default function QuestionEditor({ questions, onChange, settings = defaultRoundSettings(), onSettingsChange = () => undefined }: QuestionEditorProps) {
+export default function QuestionEditor({ questions, onChange, settings = defaultRoundSettings(), onSettingsChange = () => undefined, onImport = () => undefined }: QuestionEditorProps) {
   const roundCounts = new Map<number, number>();
   for (const question of questions) roundCounts.set(question.roundNo, (roundCounts.get(question.roundNo) ?? 0) + 1);
   const invalidQuestions = questions.flatMap((question) => {
@@ -37,6 +39,7 @@ export default function QuestionEditor({ questions, onChange, settings = default
 
   return <section className="setup-section" aria-labelledby="questions-title">
     <div className="section-heading"><div><p className="eyebrow">01 · QUESTION BANK</p><h2 id="questions-title">คำถามตามกติกา</h2></div><span className="count-pill">{`${questions.length} ข้อ`}</span></div>
+    <QuestionImportPanel settings={settings} onApply={onImport} />
     <QuestionSettingsEditor settings={settings} onChange={onSettingsChange} />
     <div className="round-grid">
       {settings.map((setting) => <div className="round-chip" key={setting.roundNo}><span>{`รอบ ${setting.roundNo} · ${roundCounts.get(setting.roundNo) ?? 0}/${setting.questionCount} ข้อ`}</span><small>{QUESTION_TYPE_LABELS[setting.questionType]} · {setting.timingMode === 'total' ? `${setting.timeLimitSec} วิรวม` : `${setting.timeLimitSec} วิ/ข้อ`}</small></div>)}

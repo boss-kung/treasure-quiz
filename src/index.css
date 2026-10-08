@@ -96,6 +96,15 @@ button:disabled { cursor: not-allowed; opacity: .42; }
 .question-fields { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; padding: 0 14px 14px; }
 .question-fields label { display: grid; gap: 6px; color: #bfb3ca; font-size: .76rem; }
 .question-fields label:nth-child(3) { grid-column: 1 / -1; }
+.question-import-panel { margin-top: 16px; padding: 15px; border: 1px solid rgba(255, 217, 140, .18); border-radius: 16px; background: rgba(25, 19, 34, .58); }
+.question-import-panel h3 { margin: 3px 0 0; color: #fff8ed; font-size: 1rem; }
+.import-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.file-input-button { display: inline-flex; align-items: center; position: relative; overflow: hidden; }
+.file-input-button input { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; opacity: 0; cursor: pointer; }
+.import-preview { display: grid; gap: 10px; margin-top: 14px; padding: 13px; border: 1px solid #3d314b; border-radius: 14px; background: #211a2a; }
+.import-preview-heading { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: #fff2d4; font-size: .82rem; }
+.import-round-summary { display: flex; flex-wrap: wrap; gap: 6px; }
+.import-round-summary span { padding: 6px 8px; color: #c9bfd4; border: 1px solid #443652; border-radius: 999px; font-size: .72rem; }
 .question-settings { margin-top: 16px; padding: 15px; border: 1px solid rgba(196, 166, 255, .14); border-radius: 16px; background: rgba(25, 19, 34, .58); }
 .question-settings h3 { margin: 3px 0 0; color: #fff8ed; font-size: 1rem; }
 .round-settings-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
@@ -133,7 +142,7 @@ button:disabled { cursor: not-allowed; opacity: .42; }
 .lobby-card p { margin: 5px 0 0; color: #bfb3ca; font-size: .9rem; }
 .connection-dot { width: 14px; height: 14px; flex: none; border-radius: 50%; background: #7e7287; box-shadow: 0 0 0 6px rgba(126, 114, 135, .12); }
 .connection-dot[data-online="true"] { background: #8de3a1; box-shadow: 0 0 0 6px rgba(141, 227, 161, .13), 0 0 22px rgba(141, 227, 161, .55); }
-@media (max-width: 640px) { .host-screen { padding-inline: 14px; } .screen-header { align-items: flex-start; flex-direction: column; } .round-grid, .round-settings-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } .question-preview, .question-fields, .chest-edit-grid, .reward-edit-grid { grid-template-columns: 1fr; } .question-fields label:nth-child(3) { grid-column: auto; } .reward-catalog-edit-card { align-items: stretch; flex-direction: column; } .reward-catalog-edit-card .reward-edit-grid { grid-template-columns: 1fr; } .reward-edit-row { grid-template-columns: 1fr 1fr auto; } .setup-footer { align-items: stretch; } .setup-footer p { width: 100%; } .setup-footer button { flex: 1; } }
+@media (max-width: 640px) { .host-screen { padding-inline: 14px; } .screen-header { align-items: flex-start; flex-direction: column; } .round-grid, .round-settings-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } .question-preview, .question-fields, .chest-edit-grid, .reward-edit-grid { grid-template-columns: 1fr; } .question-fields label:nth-child(3) { grid-column: auto; } .reward-catalog-edit-card { align-items: stretch; flex-direction: column; } .reward-catalog-edit-card .reward-edit-grid { grid-template-columns: 1fr; } .reward-edit-row { grid-template-columns: 1fr 1fr auto; } .setup-footer { align-items: stretch; } .setup-footer p { width: 100%; } .setup-footer button { flex: 1; } .import-actions { align-items: stretch; flex-direction: column; } .import-actions > * { width: 100%; justify-content: center; } .import-preview-heading { align-items: flex-start; flex-direction: column; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
 
 .player-screen { width: min(100%, 760px); min-height: 100vh; margin: 0 auto; padding: 28px 18px 44px; }

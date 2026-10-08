@@ -28,6 +28,15 @@ npm run build
 npm run test:e2e
 ```
 
+## นำเข้าคำถามจากไฟล์
+
+ในหน้า Host Setup กดดาวน์โหลด template CSV หรือ Excel แล้วกรอกคอลัมน์:
+
+`round_no`, `position`, `question_type`, `prompt`, `keyword`, `choices`, `correct_answer`, `difficulty`
+
+คั่นตัวเลือกในช่อง `choices` ด้วย `|` เช่น `A|B|C` จากนั้นอัปโหลดไฟล์เพื่อดู
+preview และข้อผิดพลาดรายแถวก่อนกดยืนยันนำเข้า คำถามเดิมจะถูกแทนที่ทั้งชุดเมื่อกดยืนยันเท่านั้น
+
 ## Deploy
 
 Workflow ใน `.github/workflows/deploy.yml` จะ deploy ทุกครั้งที่ push เข้า

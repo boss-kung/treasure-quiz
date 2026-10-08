@@ -83,7 +83,7 @@ export default function HostSetupScreen({ initialQuestions, initialChests, initi
   return <main className="host-screen setup-screen">
     <header className="screen-header"><div><p className="eyebrow">TREASURE QUIZ · SETUP</p><h1>จัดโต๊ะสมบัติ</h1><p className="lead">{summary}</p></div><span className="live-badge">PRIVATE DUEL</span></header>
     {pinError || error ? <p className="inline-error banner-error" role="alert">{pinError ?? error}</p> : null}
-    <div className="setup-stack"><QuestionEditor questions={questions} onChange={setQuestions} settings={roundSettings} onSettingsChange={updateRoundSettings} /><ChestSettingsEditor chests={chests} onChange={setChests} onRemove={removeChest} onAdd={addChest} /><RewardCatalogEditor rewards={rewards} onChange={setRewards} onRemove={removeReward} onAdd={addReward} /></div>
+    <div className="setup-stack"><QuestionEditor questions={questions} onChange={setQuestions} settings={roundSettings} onSettingsChange={updateRoundSettings} onImport={(importedQuestions, importedSettings) => { setQuestions(importedQuestions); setRoundSettings(importedSettings); }} /><ChestSettingsEditor chests={chests} onChange={setChests} onRemove={removeChest} onAdd={addChest} /><RewardCatalogEditor rewards={rewards} onChange={setRewards} onRemove={removeReward} onAdd={addReward} /></div>
     <footer className="setup-footer"><p className="muted">กดสร้างเกมเพื่อบันทึกกติกาแต่ละรอบพร้อมคำถาม หีบ และรางวัลทั้งหมด</p><button className="primary-button" onClick={createGame} disabled={invalid || saving}>{saving ? 'กำลังบันทึก…' : 'สร้างเกม'}</button><button className="secondary-button" onClick={saveSettings} disabled={invalid || saving}>บันทึกคำถามและคลังรางวัล</button></footer>
   </main>;
 }
